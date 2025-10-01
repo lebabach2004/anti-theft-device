@@ -1,0 +1,979 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x3 (DOWNLOAD_BOOT(UART0/UART1/SDIO_REI_REO_V2))
+waiting for download
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6276
+load:0x40078000,len:15716
+load:0x40080400,len:4
+ho 8 tail 4 room 4
+load:0x40080404,len:3860
+entry 0x4008063c
+[0;32mI (31) boot: ESP-IDF v5.4-1-ge33cb68d2a-dirty 2nd stage bootloader[0m
+[0;32mI (31) boot: compile time Sep 20 2025 10:12:19[0m
+[0;32mI (31) boot: Multicore bootloader[0m
+[0;32mI (34) boot: chip revision: v3.1[0m
+[0;32mI (37) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (41) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (44) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (48) boot: Enabling RNG early entropy source...[0m
+[0;32mI (52) boot: Partition Table:[0m
+[0;32mI (55) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (61) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (68) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (74) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (81) boot: End of partition table[0m
+[0;32mI (84) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=0b694h ( 46740) map[0m
+[0;32mI (107) esp_image: segment 1: paddr=0001b6bc vaddr=3ff80000 size=0001ch (    28) load[0m
+[0;32mI (108) esp_image: segment 2: paddr=0001b6e0 vaddr=3ffb0000 size=0239ch (  9116) load[0m
+[0;32mI (115) esp_image: segment 3: paddr=0001da84 vaddr=40080000 size=02594h (  9620) load[0m
+[0;32mI (123) esp_image: segment 4: paddr=00020020 vaddr=400d0020 size=189e4h (100836) map[0m
+[0;32mI (161) esp_image: segment 5: paddr=00038a0c vaddr=40082594 size=0bde4h ( 48612) load[0m
+[0;32mI (187) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (187) boot: Disabling RNG early entropy source...[0m
+[0;32mI (197) cpu_start: Multicore app[0m
+[0;32mI (206) cpu_start: Pro cpu start user code[0m
+[0;32mI (206) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (206) app_init: Application information:[0m
+[0;32mI (206) app_init: Project name:     hello_world[0m
+[0;32mI (210) app_init: App version:      v5.4-1-ge33cb68d2a-dirty[0m
+[0;32mI (215) app_init: Compile time:     Sep 20 2025 10:12:07[0m
+[0;32mI (220) app_init: ELF file SHA256:  7f8b014f0...[0m
+[0;32mI (225) app_init: ESP-IDF:          v5.4-1-ge33cb68d2a-dirty[0m
+[0;32mI (230) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (234) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (238) efuse_init: Chip rev:         v3.1[0m
+[0;32mI (242) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (248) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (253) heap_init: At 3FFB2C70 len 0002D390 (180 KiB): DRAM[0m
+[0;32mI (258) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (264) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (269) heap_init: At 4008E378 len 00011C88 (71 KiB): IRAM[0m
+[0;32mI (276) spi_flash: detected chip: generic[0m
+[0;32mI (278) spi_flash: flash io: dio[0m
+[0;33mW (281) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (293) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (304) main_task: Started on CPU0[0m
+[0;32mI (314) main_task: Calling app_main()[0m
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 8.58 degrees
+Pitch: 18.23 degrees
+Quaternion Roll: 1.68 degrees
+Quaternion Pitch: 3.72 degrees
+Quaternion Yaw: -0.30 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 14.59 degrees
+Pitch: 31.00 degrees
+Quaternion Roll: 2.46 degrees
+Quaternion Pitch: 5.74 degrees
+Quaternion Yaw: -0.40 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 18.80 degrees
+Pitch: 39.93 degrees
+Quaternion Roll: 3.20 degrees
+Quaternion Pitch: 7.67 degrees
+Quaternion Yaw: -0.46 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 21.74 degrees
+Pitch: 46.19 degrees
+Quaternion Roll: 3.99 degrees
+Quaternion Pitch: 9.76 degrees
+Quaternion Yaw: -0.51 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 23.80 degrees
+Pitch: 50.56 degrees
+Quaternion Roll: 4.83 degrees
+Quaternion Pitch: 11.98 degrees
+Quaternion Yaw: -0.54 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 25.24 degrees
+Pitch: 53.63 degrees
+Quaternion Roll: 5.72 degrees
+Quaternion Pitch: 14.29 degrees
+Quaternion Yaw: -0.56 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 26.25 degrees
+Pitch: 55.77 degrees
+Quaternion Roll: 6.63 degrees
+Quaternion Pitch: 16.64 degrees
+Quaternion Yaw: -0.56 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 26.96 degrees
+Pitch: 57.27 degrees
+Quaternion Roll: 7.55 degrees
+Quaternion Pitch: 19.00 degrees
+Quaternion Yaw: -0.54 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 27.46 degrees
+Pitch: 58.33 degrees
+Quaternion Roll: 8.46 degrees
+Quaternion Pitch: 21.32 degrees
+Quaternion Yaw: -0.50 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 27.80 degrees
+Pitch: 59.06 degrees
+Quaternion Roll: 9.37 degrees
+Quaternion Pitch: 23.60 degrees
+Quaternion Yaw: -0.45 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.04 degrees
+Pitch: 59.58 degrees
+Quaternion Roll: 10.26 degrees
+Quaternion Pitch: 25.83 degrees
+Quaternion Yaw: -0.39 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.21 degrees
+Pitch: 59.94 degrees
+Quaternion Roll: 11.15 degrees
+Quaternion Pitch: 27.99 degrees
+Quaternion Yaw: -0.31 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.33 degrees
+Pitch: 60.19 degrees
+Quaternion Roll: 12.02 degrees
+Quaternion Pitch: 30.08 degrees
+Quaternion Yaw: -0.22 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.42 degrees
+Pitch: 60.37 degrees
+Quaternion Roll: 12.87 degrees
+Quaternion Pitch: 32.09 degrees
+Quaternion Yaw: -0.12 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.47 degrees
+Pitch: 60.49 degrees
+Quaternion Roll: 13.70 degrees
+Quaternion Pitch: 34.04 degrees
+Quaternion Yaw: -0.01 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.52 degrees
+Pitch: 60.58 degrees
+Quaternion Roll: 14.52 degrees
+Quaternion Pitch: 35.91 degrees
+Quaternion Yaw: 0.11 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.54 degrees
+Pitch: 60.64 degrees
+Quaternion Roll: 15.33 degrees
+Quaternion Pitch: 37.70 degrees
+Quaternion Yaw: 0.23 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.56 degrees
+Pitch: 60.68 degrees
+Quaternion Roll: 16.11 degrees
+Quaternion Pitch: 39.42 degrees
+Quaternion Yaw: 0.35 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.58 degrees
+Pitch: 60.71 degrees
+Quaternion Roll: 16.87 degrees
+Quaternion Pitch: 41.06 degrees
+Quaternion Yaw: 0.47 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.59 degrees
+Pitch: 60.73 degrees
+Quaternion Roll: 17.62 degrees
+Quaternion Pitch: 42.63 degrees
+Quaternion Yaw: 0.60 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.59 degrees
+Pitch: 60.74 degrees
+Quaternion Roll: 18.34 degrees
+Quaternion Pitch: 44.12 degrees
+Quaternion Yaw: 0.72 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.60 degrees
+Pitch: 60.75 degrees
+Quaternion Roll: 19.05 degrees
+Quaternion Pitch: 45.54 degrees
+Quaternion Yaw: 0.83 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.60 degrees
+Pitch: 60.76 degrees
+Quaternion Roll: 19.73 degrees
+Quaternion Pitch: 46.89 degrees
+Quaternion Yaw: 0.95 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.60 degrees
+Pitch: 60.77 degrees
+Quaternion Roll: 20.39 degrees
+Quaternion Pitch: 48.16 degrees
+Quaternion Yaw: 1.05 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.77 degrees
+Quaternion Roll: 21.03 degrees
+Quaternion Pitch: 49.37 degrees
+Quaternion Yaw: 1.15 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.77 degrees
+Quaternion Roll: 21.64 degrees
+Quaternion Pitch: 50.50 degrees
+Quaternion Yaw: 1.24 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.77 degrees
+Quaternion Roll: 22.22 degrees
+Quaternion Pitch: 51.56 degrees
+Quaternion Yaw: 1.31 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 22.78 degrees
+Quaternion Pitch: 52.56 degrees
+Quaternion Yaw: 1.37 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 23.31 degrees
+Quaternion Pitch: 53.49 degrees
+Quaternion Yaw: 1.42 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 23.82 degrees
+Quaternion Pitch: 54.36 degrees
+Quaternion Yaw: 1.45 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 24.29 degrees
+Quaternion Pitch: 55.16 degrees
+Quaternion Yaw: 1.47 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 24.74 degrees
+Quaternion Pitch: 55.89 degrees
+Quaternion Yaw: 1.46 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 25.15 degrees
+Quaternion Pitch: 56.57 degrees
+Quaternion Yaw: 1.44 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 25.54 degrees
+Quaternion Pitch: 57.18 degrees
+Quaternion Yaw: 1.40 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 25.89 degrees
+Quaternion Pitch: 57.73 degrees
+Quaternion Yaw: 1.33 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 26.22 degrees
+Quaternion Pitch: 58.23 degrees
+Quaternion Yaw: 1.25 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 26.52 degrees
+Quaternion Pitch: 58.67 degrees
+Quaternion Yaw: 1.15 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 26.79 degrees
+Quaternion Pitch: 59.06 degrees
+Quaternion Yaw: 1.02 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 27.03 degrees
+Quaternion Pitch: 59.40 degrees
+Quaternion Yaw: 0.87 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 27.25 degrees
+Quaternion Pitch: 59.69 degrees
+Quaternion Yaw: 0.71 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 27.44 degrees
+Quaternion Pitch: 59.93 degrees
+Quaternion Yaw: 0.52 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 27.61 degrees
+Quaternion Pitch: 60.13 degrees
+Quaternion Yaw: 0.32 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 27.76 degrees
+Quaternion Pitch: 60.29 degrees
+Quaternion Yaw: 0.10 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 27.88 degrees
+Quaternion Pitch: 60.42 degrees
+Quaternion Yaw: -0.14 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 27.99 degrees
+Quaternion Pitch: 60.52 degrees
+Quaternion Yaw: -0.40 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.08 degrees
+Quaternion Pitch: 60.59 degrees
+Quaternion Yaw: -0.67 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.16 degrees
+Quaternion Pitch: 60.64 degrees
+Quaternion Yaw: -0.96 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.22 degrees
+Quaternion Pitch: 60.68 degrees
+Quaternion Yaw: -1.26 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.27 degrees
+Quaternion Pitch: 60.70 degrees
+Quaternion Yaw: -1.57 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.30 degrees
+Quaternion Pitch: 60.71 degrees
+Quaternion Yaw: -1.90 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.33 degrees
+Quaternion Pitch: 60.72 degrees
+Quaternion Yaw: -2.24 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.35 degrees
+Quaternion Pitch: 60.73 degrees
+Quaternion Yaw: -2.59 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.36 degrees
+Quaternion Pitch: 60.73 degrees
+Quaternion Yaw: -2.94 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.37 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -3.30 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.38 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -3.66 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.39 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -4.02 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.39 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -4.39 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.39 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -4.76 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -5.13 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -5.50 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -5.87 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -6.24 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -6.62 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -6.99 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -7.36 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -7.73 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -8.10 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -8.48 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -8.85 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -9.22 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -9.60 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -9.97 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -10.34 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -10.71 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -11.09 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -11.46 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -11.83 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -12.20 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -12.58 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -12.95 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -13.32 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -13.70 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -14.07 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -14.44 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -14.81 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -15.19 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -15.56 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -15.93 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -16.30 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -16.68 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -17.05 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -17.42 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -17.80 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -18.17 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -18.54 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -18.91 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -19.29 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -19.66 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -20.03 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -20.40 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -20.78 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -21.15 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -21.52 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -21.90 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -22.27 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -22.64 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -23.01 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -23.39 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -23.76 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -24.13 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -24.50 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -24.88 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -25.25 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -25.62 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -25.99 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -26.37 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -26.74 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -27.11 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -27.48 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -27.86 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -28.23 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -28.60 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -28.98 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -29.35 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -29.72 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -30.09 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -30.47 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -30.84 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -31.21 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -31.58 degrees
+Accel: X=-1.12 m/s^2, Y=0.30 m/s^2, Z=0.55 m/s^2
+Gyro: X=0.27 deg/s, Y=-0.24 deg/s, Z=-0.16 deg/s
+Roll: 28.61 degrees
+Pitch: 60.78 degrees
+Quaternion Roll: 28.40 degrees
+Quaternion Pitch: 60.74 degrees
+Quaternion Yaw: -31.96 degrees
