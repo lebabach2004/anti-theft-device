@@ -31,8 +31,8 @@
 
 /// mpu6050.c code starts 
 #include "mpu6050.h"
-#define I2C_MASTER_SCL_IO    22 
-#define I2C_MASTER_SDA_IO    21
+#define I2C_MASTER_SCL_IO    19 
+#define I2C_MASTER_SDA_IO    18
 
 #define ACCEL_SCALE 16384.0f // for ±2g range
 #define GYRO_SCALE 131.0f // for ±250°/s range
@@ -58,7 +58,10 @@ static esp_err_t i2c_init(i2c_port_t i2c_num){
     return ESP_OK;
 }
 esp_err_t mpu6050_init(i2c_port_t i2c_num) {
-    uint8_t data = 0;
+    // uint8_t data = 0;
+    uint8_t data[2];
+    data[0] = 0x6B;   // PWR_MGMT_1
+    data[1] = 0x01; 
     esp_err_t ret;
 
     // Initialize I2C
@@ -68,8 +71,8 @@ esp_err_t mpu6050_init(i2c_port_t i2c_num) {
     }
 
     // Wake up the MPU6050
-    data = 0x00; // Clear sleep bit
-    ret = i2c_master_write_to_device(i2c_num, MPU6050_ADDR, &data, 1, 1000 / portTICK_PERIOD_MS);
+    // data = 0x00; // Clear sleep bit
+    ret = i2c_master_write_to_device(i2c_num, MPU6050_ADDR, data, 2, 1000 / portTICK_PERIOD_MS);
     if (ret != ESP_OK) {
         return ret;
     }

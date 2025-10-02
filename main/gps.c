@@ -1,7 +1,19 @@
 #include "gps.h"
 #define BUF_SIZE 1024
 extern GPS_t GPS;
-static const char *TAG = "GPS";
+esp_err_t GPS_init(void){
+    const uart_config_t uart_config = {
+        .baud_rate = 9600,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+    };
+    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, BUF_SIZE * 2, 0, 0, NULL, 0));
+    ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, GPIO_NUM_14, GPIO_NUM_15, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    return ESP_OK;
+}
 int GPS_validate(char *nmeastr){
     char check[3];
     char checkcalcstr[3];
@@ -56,9 +68,12 @@ void GPS_parse(char *GPSstrParse){
     	}
     }
     else if (!strncmp(GPSstrParse, "$GPRMC", 6)){
-    	if(sscanf(GPSstrParse, "$GPRMC,%f,%f,%c,%f,%c,%f,%f,%d", &GPS.utc_time, &GPS.nmea_latitude, &GPS.ns, &GPS.nmea_longitude, &GPS.ew, &GPS.speed_k, &GPS.course_d, &GPS.date) >= 1)
-    		return;
-
+        char status;
+    	if(sscanf(GPSstrParse, "$GPRMC,%f,%c,%f,%c,%f,%c,%f,%f,%d", &GPS.utc_time, &status, &GPS.nmea_latitude, &GPS.ns, &GPS.nmea_longitude, &GPS.ew, &GPS.speed_k, &GPS.course_d, &GPS.date) >= 1){
+            GPS.dec_latitude = GPS_nmea_to_dec(GPS.nmea_latitude, GPS.ns);
+    		GPS.dec_longitude = GPS_nmea_to_dec(GPS.nmea_longitude, GPS.ew);
+            return;
+        }
     }
     else if (!strncmp(GPSstrParse, "$GPGLL", 6)){
         if(sscanf(GPSstrParse, "$GPGLL,%f,%c,%f,%c,%f,%c", &GPS.nmea_latitude, &GPS.ns, &GPS.nmea_longitude, &GPS.ew, &GPS.utc_time, &GPS.gll_status) >= 1)

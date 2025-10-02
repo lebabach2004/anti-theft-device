@@ -2,6 +2,9 @@
 #define __GPS_H__
 #include <stdio.h>
 #include <string.h>
+#include "esp_err.h"
+#include <driver/uart.h>
+#include <driver/gpio.h>
 typedef struct{
 
     // calculated values
@@ -40,4 +43,5 @@ typedef struct{
 } GPS_t;
 int GPS_validate(char *nmeastr);
 void GPS_parse(char *GPSstrParse);
+esp_err_t GPS_init(void);
 #endif
