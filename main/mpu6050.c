@@ -31,6 +31,8 @@
 
 /// mpu6050.c code starts 
 #include "mpu6050.h"
+#define I2C_MASTER_SCL_IO    22 
+#define I2C_MASTER_SDA_IO    21
 
 #define ACCEL_SCALE 16384.0f // for ±2g range
 #define GYRO_SCALE 131.0f // for ±250°/s range
@@ -39,9 +41,31 @@
 static float accel_bias[3] = {1.12f, -0.30f, -0.55f}; // Biases for accel X, Y, Z
 static float gyro_bias[3] = {-0.27f, 0.24f, 0.16f}; // Biases for gyro X, Y, Z
 
+static esp_err_t i2c_init(i2c_port_t i2c_num){
+    i2c_config_t conf = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = I2C_MASTER_SDA_IO,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
+        .scl_io_num = I2C_MASTER_SCL_IO,
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .master.clk_speed = 400000,
+    };
+    esp_err_t ret;
+    ret = i2c_param_config(i2c_num, &conf);
+    if (ret != ESP_OK) return ret;
+    ret = i2c_driver_install(i2c_num, conf.mode, 0, 0, 0);
+    if (ret != ESP_OK) return ret;
+    return ESP_OK;
+}
 esp_err_t mpu6050_init(i2c_port_t i2c_num) {
     uint8_t data = 0;
     esp_err_t ret;
+
+    // Initialize I2C
+    ret = i2c_init(i2c_num);
+    if (ret != ESP_OK) {
+        return ret;
+    }
 
     // Wake up the MPU6050
     data = 0x00; // Clear sleep bit
