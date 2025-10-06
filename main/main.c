@@ -13,11 +13,13 @@
 #include <string.h>
 #include <driver/uart.h>
 #include "sdkconfig.h"
-
+#include "nvs_flash.h"
 #include "mpu6050.h"
 #include "roll_pitch.h"
 #include "quaternions.h"
 #include "gps.h"
+#include "wifi_sta.h"
+#include "http_server_app.h"
 #define PIN_CLK 18
 
 #define BUF_SIZE 1024
@@ -106,7 +108,14 @@ void mpu6050_task(void *arg){
     }
 }
 void app_main() {
-    esp_err_t ret;
+    //Initialize NVS
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+      ESP_ERROR_CHECK(nvs_flash_erase());
+      ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
     // Init GPS
     ret=GPS_init();
     if (ret != ESP_OK) {
@@ -121,8 +130,9 @@ void app_main() {
         return;
     }
     mpu6050_calibrate(I2C_NUM_0, accel_bias, gyro_bias);
-
-    xTaskCreate(gps_rx_task, "gps_rx_task", 2048, NULL, 10, NULL);
-    xTaskCreate(gps_process_task,"gps_process_task",2048,NULL,11,NULL);
-    xTaskCreate(mpu6050_task, "mpu6050_task", 2048, NULL, 7, NULL);
+    wifi_start();
+    start_webserver();
+    // xTaskCreate(gps_rx_task, "gps_rx_task", 2048, NULL, 10, NULL);
+    // xTaskCreate(gps_process_task,"gps_process_task",2048,NULL,11,NULL);
+    // xTaskCreate(mpu6050_task, "mpu6050_task", 2048, NULL, 7, NULL);
 }

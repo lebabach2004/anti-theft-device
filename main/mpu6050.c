@@ -60,7 +60,7 @@ static esp_err_t i2c_init(i2c_port_t i2c_num){
 esp_err_t mpu6050_init(i2c_port_t i2c_num) {
     // uint8_t data = 0;
     uint8_t data[2];
-    data[0] = 0x6B;   // PWR_MGMT_1
+    data[0] = MPU6050_REG_PWR_MGMT_1;   // PWR_MGMT_1
     data[1] = 0x01; 
     esp_err_t ret;
 

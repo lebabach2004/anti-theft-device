@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý số điện thoại xe máy</title>
+<!-- Thêm Font Awesome cho icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 700px; margin: 30px auto; background: #f0f8ff; }
+    h1 { text-align: center; color: #222; }
+    .container { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    input[type="text"] { padding: 10px; font-size: 16px; width: 250px; border-radius: 8px; border: 1px solid #ccc; }
+    button { padding: 8px 15px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    button.add { background-color: #28a745; color: #fff; }
+    button.add:hover { background-color: #218838; }
+    button.delete { background-color: #dc3545; color: #fff; }
+    button.delete:hover { background-color: #c82333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    tr:hover { background-color: #f1f1f1; }
+    #message { margin-top: 15px; font-weight: bold; color: green; }
+    .icon { margin-right: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1><i class="fa-solid fa-motorcycle icon"></i> Quản lý số điện thoại xe máy</h1>
+
+    <div>
+        <input type="text" id="phoneInput" placeholder="Nhập số điện thoại">
+        <button class="add" onclick="addPhone()">
+            <i class="fa-solid fa-plus icon"></i> Đăng ký
+        </button>
+    </div>
+
+    <table id="phoneTable">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Số điện thoại</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Danh sách số điện thoại sẽ được JS thêm vào -->
+        </tbody>
+    </table>
+
+    <div id="message"></div>
+</div>
+
+<script>
+// Load danh sách số điện thoại từ ESP32
+async function fetchPhones() {
+    try {
+        const res = await fetch('/list');
+        const data = await res.text();
+        const tbody = document.querySelector('#phoneTable tbody');
+        tbody.innerHTML = '';
+        if(data){
+            data.split(',').forEach((number, index) => {
+                number = number.trim();
+                if(number==='') return;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${number}</td>
+                    <td>
+                        <button class="delete" onclick="removePhone('${number}')">
+                            <i class="fa-solid fa-trash icon"></i> Xóa
+                        </button>  
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch(e){
+        console.error('Lỗi fetch danh sách:', e);
+        document.getElementById('message').textContent = 'Không thể kết nối ESP32';
+    }
+}
+
+// Thêm số điện thoại
+async function addPhone() {
+    const number = document.getElementById('phoneInput').value.trim();
+    if(!number) return alert('Vui lòng nhập số điện thoại');
+    try {
+        await fetch('/add', {
+            method:'POST',
+            body: new URLSearchParams({number})
+        });
+        document.getElementById('phoneInput').value = '';
+        fetchPhones();
+        document.getElementById('message').textContent = 'Thêm số thành công';
+    } catch(e){
+        console.error('Lỗi thêm số:', e);
+        document.getElementById('message').textContent = 'Thêm số thất bại';
+    }
+}
+
+// Xóa số điện thoại
+async function removePhone(number) {
+    if(!confirm(`Bạn có muốn xóa số ${number}?`)) return;
+    try {
+        await fetch('/remove', {
+            method:'POST',
+            body: new URLSearchParams({number})
+        });
+        fetchPhones();
+        document.getElementById('message').textContent = `Đã xóa số ${number}`;
+    } catch(e){
+        console.error('Lỗi xóa số:', e);
+        document.getElementById('message').textContent = 'Xóa số thất bại';
+    }
+}
+
+// Tải danh sách khi mở web
+fetchPhones();
+</script>
+</body>
+</html>
