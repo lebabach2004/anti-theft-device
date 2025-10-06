@@ -14,6 +14,7 @@
 #include "esp_err.h"
 #include "driver/gpio.h"
 #include <ctype.h>
+#include "json_generator.h"
 #define EXAMPLE_HTTP_QUERY_KEY_MAX_LEN  (64)
 static httpd_handle_t server = NULL;
 extern const uint8_t index_html_start[] asm("_binary_index_html_start");
@@ -118,10 +119,29 @@ static char* get_list_csv(void) {
     return buffer;
 }
 static esp_err_t list_phonenumber_handler(httpd_req_t *req){
-    char *list = get_list_csv();
-    printf("List: %s\n", list);
-    httpd_resp_set_type(req, "text/plain");
-    httpd_resp_sendstr(req, list);
+    // char *list = get_list_csv();
+    // printf("List: %s\n", list);
+    // httpd_resp_set_type(req, "text/plain");
+    // httpd_resp_sendstr(req, list);
+    // return ESP_OK;
+    char buffer[1024];
+    json_gen_str_t jstr;
+    json_gen_str_start(&jstr, buffer, sizeof(buffer), NULL, NULL);
+    json_gen_start_object(&jstr);
+    json_gen_push_array(&jstr, "phones");
+    for (int i = 0; i < phone_count; i++) {
+        json_gen_start_object(&jstr);
+        json_gen_obj_set_int(&jstr, "id", i + 1);
+        json_gen_obj_set_string(&jstr, "number", phone_list[i]);
+        json_gen_end_object(&jstr);
+    }
+    json_gen_pop_array(&jstr);
+    json_gen_end_object(&jstr);
+     int len = json_gen_str_end(&jstr);
+    printf("Generated JSON: %s\n%d\n", buffer,len);
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, buffer, len-1); 
+
     return ESP_OK;
 }
 static const httpd_uri_t  list_phonenumber= {

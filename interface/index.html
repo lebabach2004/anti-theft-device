@@ -53,20 +53,18 @@
 // Load danh sách số điện thoại từ ESP32
 async function fetchPhones() {
     try {
-        const res = await fetch('/list');
-        const data = await res.text();
+        const res = await fetch('/list')
+        const data = await res.json();
         const tbody = document.querySelector('#phoneTable tbody');
         tbody.innerHTML = '';
-        if(data){
-            data.split(',').forEach((number, index) => {
-                number = number.trim();
-                if(number==='') return;
+        if (data.phones && data.phones.length > 0) {
+            data.phones.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${number}</td>
+                    <td>${item.id}</td>
+                    <td>${item.number}</td>
                     <td>
-                        <button class="delete" onclick="removePhone('${number}')">
+                            <button class="delete" onclick="removePhone('${item.number}')">
                             <i class="fa-solid fa-trash icon"></i> Xóa
                         </button>  
                     </td>
