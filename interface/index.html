@@ -85,7 +85,8 @@ async function addPhone() {
     try {
         const res = await fetch('/add', {
             method:'POST',
-            body: new URLSearchParams({number})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ number })
         });
         const text = await res.text(); 
         if (!res.ok){
@@ -107,7 +108,8 @@ async function removePhone(number) {
     try {
         await fetch('/remove', {
             method:'POST',
-            body: new URLSearchParams({number})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ number })
         });
         fetchPhones();
         document.getElementById('message').textContent = `Đã xóa số ${number}`;

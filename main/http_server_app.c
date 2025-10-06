@@ -15,6 +15,7 @@
 #include "driver/gpio.h"
 #include <ctype.h>
 #include "json_generator.h"
+#include <json_parser.h>
 #define EXAMPLE_HTTP_QUERY_KEY_MAX_LEN  (64)
 static httpd_handle_t server = NULL;
 extern const uint8_t index_html_start[] asm("_binary_index_html_start");
@@ -31,6 +32,18 @@ static int is_valid_phone(const char* number){
         if(!isdigit((unsigned char)number[i])) return 0; 
     }
     return 1; 
+}
+esp_err_t parse_number_from_req( char *buf, int ret, char *number_buf, int buf_size){
+    jparse_ctx_t jctx;
+    if (json_parse_start(&jctx, buf, ret) != OS_SUCCESS) {
+        return ESP_FAIL; 
+    }
+     if (json_obj_get_string(&jctx, "number", number_buf, buf_size) != OS_SUCCESS) {
+        json_parse_end(&jctx);
+        return ESP_FAIL; // Missing number
+    }
+    json_parse_end(&jctx);
+    return ESP_OK;
 }
 esp_err_t http_404_error_handler(httpd_req_t *req, httpd_err_code_t err)
 {
@@ -58,12 +71,6 @@ static const httpd_uri_t get_server_interface = {
     .handler   = get_server_interface_handler,
     .user_ctx  = "NULL"
 };
-static char* url_decode_param(const char *body){
-    const char *p = strstr(body, "number=");
-    if(!p) return NULL;
-    p += strlen("number=");
-    return strdup(p);
-}
 static int add_number(const char* number){
     if(phone_count >= 10) return -1;
     phone_list[phone_count] = strdup(number);
@@ -84,22 +91,19 @@ static esp_err_t add_phonenumber_handler(httpd_req_t *req){
     }
     buf[ret]=0;
     printf("Received body: %s\n", buf);
-    char *number = url_decode_param(buf);
-    if(!number){
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing number");
+    char number[32];
+    if (parse_number_from_req(buf, ret, number, sizeof(number)) != ESP_OK) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing or invalid number");
         return ESP_FAIL;
     }
     if(!is_valid_phone(number)){
-        free(number);
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid phone number format");
         return ESP_FAIL;
     }
     if(add_number(number)!=0){
-        free(number);
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Add failed");
         return ESP_FAIL;
     }
-    free(number);
     httpd_resp_sendstr(req, "OK");
     return ESP_OK;
 }
@@ -109,21 +113,8 @@ static const httpd_uri_t  add_phonenumber= {
     .handler=add_phonenumber_handler,
     .user_ctx=NULL
 };
-static char* get_list_csv(void) {
-    static char buffer[1024];
-    buffer[0] = 0;
-    for(int i=0;i<phone_count;i++){
-        strcat(buffer, phone_list[i]);
-        if(i<phone_count-1) strcat(buffer,",");
-    }
-    return buffer;
-}
+
 static esp_err_t list_phonenumber_handler(httpd_req_t *req){
-    // char *list = get_list_csv();
-    // printf("List: %s\n", list);
-    // httpd_resp_set_type(req, "text/plain");
-    // httpd_resp_sendstr(req, list);
-    // return ESP_OK;
     char buffer[1024];
     json_gen_str_t jstr;
     json_gen_str_start(&jstr, buffer, sizeof(buffer), NULL, NULL);
@@ -138,10 +129,9 @@ static esp_err_t list_phonenumber_handler(httpd_req_t *req){
     json_gen_pop_array(&jstr);
     json_gen_end_object(&jstr);
      int len = json_gen_str_end(&jstr);
-    printf("Generated JSON: %s\n%d\n", buffer,len);
+    printf("Generated JSON: %s\n\n", buffer);
     httpd_resp_set_type(req, "application/json");
     httpd_resp_send(req, buffer, len-1); 
-
     return ESP_OK;
 }
 static const httpd_uri_t  list_phonenumber= {
@@ -176,17 +166,15 @@ esp_err_t remove_phonenumber_handler(httpd_req_t *req){
         return ESP_FAIL;
     }
     buf[ret]=0;
-    char *number = url_decode_param(buf);
-    if(!number){
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing number");
+    char number[32];
+    if (parse_number_from_req(buf, ret, number, sizeof(number)) != ESP_OK) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing or invalid number");
         return ESP_FAIL;
     }
     if(remove_number(number)!=0){
-        free(number);
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Remove failed");
         return ESP_FAIL;
     }
-    free(number);
     httpd_resp_sendstr(req, "OK");
     return ESP_OK;
 }
