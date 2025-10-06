@@ -85,10 +85,15 @@ async function addPhone() {
     const number = document.getElementById('phoneInput').value.trim();
     if(!number) return alert('Vui lòng nhập số điện thoại');
     try {
-        await fetch('/add', {
+        const res = await fetch('/add', {
             method:'POST',
             body: new URLSearchParams({number})
         });
+        const text = await res.text(); 
+        if (!res.ok){
+            document.getElementById('message').textContent = `Thêm số thất bại: ${text}`;
+            return;
+        }
         document.getElementById('phoneInput').value = '';
         fetchPhones();
         document.getElementById('message').textContent = 'Thêm số thành công';

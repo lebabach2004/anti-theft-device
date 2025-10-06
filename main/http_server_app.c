@@ -13,6 +13,7 @@
 #include "esp_check.h"
 #include "esp_err.h"
 #include "driver/gpio.h"
+#include <ctype.h>
 #define EXAMPLE_HTTP_QUERY_KEY_MAX_LEN  (64)
 static httpd_handle_t server = NULL;
 extern const uint8_t index_html_start[] asm("_binary_index_html_start");
@@ -22,6 +23,14 @@ static const char *TAG = "HTPP_SERVER_APP";
 static char *phone_list[10];
 static int phone_count = 0;
 
+static int is_valid_phone(const char* number){
+    int len = strlen(number);
+    if(len < 10 || len > 11) return 0; 
+    for(int i=0; i<len; i++){
+        if(!isdigit((unsigned char)number[i])) return 0; 
+    }
+    return 1; 
+}
 esp_err_t http_404_error_handler(httpd_req_t *req, httpd_err_code_t err)
 {
     if (strcmp("/interface", req->uri) == 0) {
@@ -79,7 +88,11 @@ static esp_err_t add_phonenumber_handler(httpd_req_t *req){
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing number");
         return ESP_FAIL;
     }
-
+    if(!is_valid_phone(number)){
+        free(number);
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid phone number format");
+        return ESP_FAIL;
+    }
     if(add_number(number)!=0){
         free(number);
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Add failed");
@@ -148,7 +161,6 @@ esp_err_t remove_phonenumber_handler(httpd_req_t *req){
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing number");
         return ESP_FAIL;
     }
-
     if(remove_number(number)!=0){
         free(number);
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Remove failed");
