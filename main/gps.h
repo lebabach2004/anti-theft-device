@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "esp_err.h"
+#include "esp_log.h"
 #include <driver/uart.h>
 #include <driver/gpio.h>
 typedef struct{

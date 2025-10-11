@@ -9,9 +9,22 @@ esp_err_t GPS_init(void){
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
     };
-    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, BUF_SIZE * 2, 0, 0, NULL, 0));
-    ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
-    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, GPIO_NUM_14, GPIO_NUM_15, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    esp_err_t ret;
+    ret = uart_driver_install(UART_NUM_1, BUF_SIZE * 2, 0, 0, NULL, 0);
+    if (ret != ESP_OK) {
+        ESP_LOGE("UART_TAG", "UART driver install failed: %s", esp_err_to_name(ret));
+        return ret;
+    }
+    ret = uart_param_config(UART_NUM_1, &uart_config);
+    if (ret != ESP_OK) {
+        ESP_LOGE("UART_TAG", "UART param config failed: %s", esp_err_to_name(ret));
+        return ret;
+    }
+    ret = uart_set_pin(UART_NUM_1, GPIO_NUM_14, GPIO_NUM_15, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    if (ret != ESP_OK) {
+        ESP_LOGE("UART_TAG", "UART set pin failed: %s", esp_err_to_name(ret));
+        return ret;
+    }
     return ESP_OK;
 }
 int GPS_validate(char *nmeastr){
