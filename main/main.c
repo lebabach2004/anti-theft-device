@@ -27,6 +27,7 @@
 #include <json_generator.h>
 #include <json_parser.h>
 #include "esp_task_wdt.h"
+#include <input_iot.h>
 
 #define PIN_CLK 18
 #define BUF_SIZE 1024
@@ -62,6 +63,7 @@ extern bool updateLocation;
 extern bool warning;
 extern bool update_OTA;
 // device state enum and variable
+extern volatile alarm_state_t alarm_state;
 typedef enum{
     NORMAL_STATE,
     ALERT_STATE,
@@ -99,7 +101,7 @@ void Task_Action_MqttMessage(void *arg) {
             updateLocation=false;
         }
         if(warning){
-            device_state=NORMAL_STATE;
+            alarm_state= STATE_IDLE;
             warning=false;
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -175,13 +177,16 @@ void mpu6050_task(void *arg){
     }
 }
 bool is_low_battery() {
-    return true; 
+    return false; 
 }
 bool accident_detected() {
     return false; 
 }
 bool is_theft_detected() {
-    return true; 
+    if(alarm_state == STATE_ALARM && antiTheft){
+        return true;
+    }
+    return false; 
 }
 void Task_StateUpdate(void *pvParameters) {
     device_state_t new_state;
@@ -195,9 +200,10 @@ void Task_StateUpdate(void *pvParameters) {
         else 
             new_state = NORMAL_STATE;
         device_state = new_state;
-
-        xQueueSend(eventQueue, &new_state, 0);
-        vTaskDelay(pdMS_TO_TICKS(500));
+        if (xQueueSend(eventQueue, &new_state, 0) != pdPASS) {
+            ESP_LOGW(TAG, "Queue full, state not sent!");
+        }  
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
 }
 void Task_ActionHandler(void *pvParameters) {
@@ -207,6 +213,7 @@ void Task_ActionHandler(void *pvParameters) {
             switch (state) {
                 case ALERT_STATE:
                     // start_alarm(); 
+                    printf("Device in ALERT_STATE\n");
                     break;
                 case SOS_STATE: 
                     // send_sos_message(); 
@@ -215,6 +222,7 @@ void Task_ActionHandler(void *pvParameters) {
                     // send_low_battery_warning(); 
                     break;
                 case NORMAL_STATE: 
+                    printf("Device in NORMAL_STATE\n");
                     // stop_alarm(); 
                     break;
             }
@@ -230,6 +238,7 @@ void app_main() {
     }
     ESP_ERROR_CHECK(ret);
     eventQueue = xQueueCreate(10, sizeof(device_state_t));
+    
     // Init SIM800C
     ret=SIM_init();
     if (ret != ESP_OK) {
@@ -242,7 +251,7 @@ void app_main() {
         ESP_LOGE("GPS", "Initialization failed");
         return;
     }
-
+    input_io_create(GPIO_NUM_4, LO_TO_HI);
     // // Initialize MPU6050
     // ret = mpu6050_init(I2C_NUM_0);
     // if (ret != ESP_OK) {
@@ -255,11 +264,6 @@ void app_main() {
     esp_ap_start();
     start_webserver();
     // sim_public_mqtt();
-    // mqtt_connect("esp32_client", "broker.hivemq.com", 200);
-    // // mqtt_publish("/test/hello", sim_public_mqtt_msg , 1000);
-    // mqtt_subscribe("esp32/device", 0, 1000);
-    // mqtt_subscribe("esp32/updateOTA", 0, 1000);
-    // xTaskCreate(Task_Create_mqtt, "Create_mqtt", 4096, NULL, 4, NULL);
     xTaskCreate(gps_rx_task, "gps_rx_task", 4096, NULL, 5, NULL);
     xTaskCreate(gps_process_task,"gps_process_task",2048,NULL,6,NULL);
     mqtt_connect("esp32_client", "broker.hivemq.com", 200);
