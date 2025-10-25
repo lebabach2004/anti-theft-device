@@ -28,7 +28,7 @@
 #include <json_parser.h>
 #include "esp_task_wdt.h"
 #include <input_iot.h>
-
+#include "buzzer.h"
 #define PIN_CLK 18
 #define BUF_SIZE 1024
 static const char *TAG = "MAIN";
@@ -38,6 +38,7 @@ static char gps_buffer[BUF_SIZE];
 static char latest_nmea[BUF_SIZE];
 int gps_index = 0;
 extern void mqtt_task(void *arg); 
+extern void buzzer_task(void *arg);
 extern char MAC_address[18];
 // MPU6050 variables
 int16_t accel_x, accel_y, accel_z;
@@ -183,7 +184,7 @@ bool accident_detected() {
     return false; 
 }
 bool is_theft_detected() {
-    if(alarm_state == STATE_ALARM && antiTheft){
+    if(alarm_state == STATE_ALARM  && antiTheft ){
         return true;
     }
     return false; 
@@ -203,7 +204,7 @@ void Task_StateUpdate(void *pvParameters) {
         if (xQueueSend(eventQueue, &new_state, 0) != pdPASS) {
             ESP_LOGW(TAG, "Queue full, state not sent!");
         }  
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(200));
     }
 }
 void Task_ActionHandler(void *pvParameters) {
@@ -213,6 +214,7 @@ void Task_ActionHandler(void *pvParameters) {
             switch (state) {
                 case ALERT_STATE:
                     // start_alarm(); 
+                    buzzer_on_alarm();
                     printf("Device in ALERT_STATE\n");
                     break;
                 case SOS_STATE: 
@@ -222,6 +224,7 @@ void Task_ActionHandler(void *pvParameters) {
                     // send_low_battery_warning(); 
                     break;
                 case NORMAL_STATE: 
+                    buzzer_off();
                     printf("Device in NORMAL_STATE\n");
                     // stop_alarm(); 
                     break;
@@ -251,6 +254,11 @@ void app_main() {
         ESP_LOGE("GPS", "Initialization failed");
         return;
     }
+    ret=buzzer_init(23);
+    if (ret != ESP_OK) {
+        ESP_LOGE("BUZZER", "Initialization failed");
+        return;
+    }
     input_io_create(GPIO_NUM_4, LO_TO_HI);
     // // Initialize MPU6050
     // ret = mpu6050_init(I2C_NUM_0);
@@ -275,4 +283,5 @@ void app_main() {
     xTaskCreate(Task_StateUpdate, "StateUpdate", 2048, NULL, 7, NULL);
     xTaskCreate(Task_ActionHandler, "ActionHandler", 2048, NULL, 8, NULL);
     xTaskCreate(Task_Action_MqttMessage, "MqttMessage", 4096, NULL, 9, NULL);
+    xTaskCreate(buzzer_task, "buzzer_task", 2048, NULL, 10, NULL);
 }
