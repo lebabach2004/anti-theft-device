@@ -1,6 +1,14 @@
 #include "gps.h"
+#include "sim.h"
 #define BUF_SIZE 1024
+#define GPS_KEEP_TIME pdMS_TO_TICKS(20000)
 extern GPS_t GPS;
+extern bool antiTheft;
+extern bool updateLocation;
+bool gps_active=false;
+
+const uint8_t GPS_POWMER_SAVE_MODE_CMD[] = {0xB5, 0x62, 0x02, 0x41, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,0x02, 0x00, 0x00, 0x00, 0x4D, 0x3B};
+const uint8_t GPS_NORMAL_MODE_CMD[] = { 0xB5, 0x62, 0x02, 0x41, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4B, 0x3B };
 esp_err_t GPS_init(void){
     const uart_config_t uart_config = {
         .baud_rate = 9600,
@@ -26,6 +34,10 @@ esp_err_t GPS_init(void){
         return ret;
     }
     return ESP_OK;
+}
+void gps_send_cmd(const uint8_t *cmd, size_t len) {
+    uart_write_bytes(UART_NUM_1, (const char *)cmd, len);
+    uart_wait_tx_done(UART_NUM_1, pdMS_TO_TICKS(100));
 }
 int GPS_validate(char *nmeastr){
     char check[3];
@@ -83,8 +95,14 @@ void GPS_parse(char *GPSstrParse){
     else if (!strncmp(GPSstrParse, "$GPRMC", 6)){
         char status;
     	if(sscanf(GPSstrParse, "$GPRMC,%f,%c,%f,%c,%f,%c,%f,%f,%d", &GPS.utc_time, &status, &GPS.nmea_latitude, &GPS.ns, &GPS.nmea_longitude, &GPS.ew, &GPS.speed_k, &GPS.course_d, &GPS.date) >= 1){
-            GPS.dec_latitude = GPS_nmea_to_dec(GPS.nmea_latitude, GPS.ns);
-    		GPS.dec_longitude = GPS_nmea_to_dec(GPS.nmea_longitude, GPS.ew);
+            if(status == 'A'){
+                GPS.dec_latitude = GPS_nmea_to_dec(GPS.nmea_latitude, GPS.ns);
+    		    GPS.dec_longitude = GPS_nmea_to_dec(GPS.nmea_longitude, GPS.ew);
+            }
+            else if(status == 'V'){
+                GPS.dec_latitude=0.0;
+                GPS.dec_longitude=0.0;
+            }
             return;
         }
     }
@@ -95,5 +113,33 @@ void GPS_parse(char *GPSstrParse){
     else if (!strncmp(GPSstrParse, "$GPVTG", 6)){
         if(sscanf(GPSstrParse, "$GPVTG,%f,%c,%f,%c,%f,%c,%f,%c", &GPS.course_t, &GPS.course_t_unit, &GPS.course_m, &GPS.course_m_unit, &GPS.speed_k, &GPS.speed_k_unit, &GPS.speed_km, &GPS.speed_km_unit) >= 1)
             return;
+    }
+}
+void gps_power_manager_task(void *arg) {
+    TickType_t last_active_time = 0;
+    while(1){
+        if(antiTheft || updateLocation){
+            if(!gps_active){
+                uart_write_bytes(UART_NUM_1, (const char *)GPS_NORMAL_MODE_CMD, sizeof(GPS_NORMAL_MODE_CMD));
+                gps_active=true;
+                printf("GPS Normal Mode Activated\n");   
+            }
+            if(updateLocation){
+                if (GPS.dec_latitude != 0.0 && GPS.dec_longitude != 0.0) {
+                    updateLocation = false;
+                }
+            }
+            last_active_time = xTaskGetTickCount();
+        }
+        else {
+            if(gps_active && (xTaskGetTickCount() - last_active_time) > GPS_KEEP_TIME){
+                uart_write_bytes(UART_NUM_1, (const char *)GPS_POWMER_SAVE_MODE_CMD, sizeof(GPS_POWMER_SAVE_MODE_CMD));
+                gps_active=false;
+                GPS.dec_latitude=0.0;
+                GPS.dec_longitude=0.0;
+                printf("GPS Power Save Mode Activated\n");
+            }
+        }
+        vTaskDelay(3000/portTICK_PERIOD_MS);
     }
 }

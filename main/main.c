@@ -29,16 +29,21 @@
 #include "esp_task_wdt.h"
 #include <input_iot.h>
 #include "buzzer.h"
+#include "adc.h"
+
+uint8_t battery_capacity=0;
+
 #define PIN_CLK 18
 #define BUF_SIZE 1024
 static const char *TAG = "MAIN";
 GPS_t GPS;
 QueueHandle_t eventQueue;
-static char gps_buffer[BUF_SIZE];
-static char latest_nmea[BUF_SIZE];
+char gps_buffer[BUF_SIZE];
+char latest_nmea[BUF_SIZE];
 int gps_index = 0;
 extern void mqtt_task(void *arg); 
 extern void buzzer_task(void *arg);
+extern void gps_power_manager_task(void *arg);
 extern char MAC_address[18];
 // MPU6050 variables
 int16_t accel_x, accel_y, accel_z;
@@ -58,7 +63,7 @@ extern char *phone_list[10];
 extern int phone_count;
 uint16_t battery=60;
 bool isCharging=false;
-
+extern bool gps_active;
 // variables from sim.c
 extern bool updateLocation;
 extern bool warning;
@@ -91,15 +96,26 @@ void sim_public_mqtt(){
     json_gen_str_end(&jstr);
     printf("Generated JSON: %s\n", sim_public_mqtt_msg);
 }
+void sim_public_battery_mqtt(uint8_t battery){
+    json_gen_str_t jstr;
+    json_gen_str_start(&jstr, sim_public_mqtt_msg, BUF_SIZE, NULL, NULL);
+    json_gen_start_object(&jstr);
+    json_gen_obj_set_int(&jstr, "battery", battery);
+    json_gen_end_object(&jstr);
+    json_gen_str_end(&jstr);
+}
 void Task_Action_MqttMessage(void *arg) {
     for (;;) {
         if(updateLocation){
             static char url[128]; 
-            snprintf(url, sizeof(url), "https://www.google.com/maps?q=%f,%f", GPS.dec_latitude, GPS.dec_longitude);
+            while(!GPS.dec_latitude && !GPS.dec_longitude){
+                ESP_LOGI("GPS","Waiting for valid GPS data...");
+                vTaskDelay(pdMS_TO_TICKS(1000));
+            }
+            snprintf(url, sizeof(url), "Vi tri hien tai: https://www.google.com/maps?q=%f,%f", GPS.dec_latitude, GPS.dec_longitude);
             for(int i=0;i<phone_count;i++){
                 sim_send_sms(phone_list[i], url, 500);
             }
-            updateLocation=false;
         }
         if(warning){
             alarm_state= STATE_IDLE;
@@ -112,13 +128,15 @@ void gps_rx_task(void *arg){
     uint8_t* data = (uint8_t*) malloc(BUF_SIZE);
     while (1) {
         int len = uart_read_bytes(UART_NUM_1, data, BUF_SIZE - 1, 50 / portTICK_PERIOD_MS);
+        // printf("GPS RX: %s\n", data);
         for(uint8_t i=0; i<len; i++){
             if(data[i] != '\n' && gps_index < BUF_SIZE - 1){
                 gps_buffer[gps_index++] = data[i];
             }
             else{
                 gps_buffer[gps_index] = '\0'; 
-                if(!strncmp(gps_buffer,"$GPRMC",6)){
+                if(!strncmp(gps_buffer,"$GPRMC",6) ){
+                    // printf("Received NMEA: %s\n", gps_buffer);
                     strncpy(latest_nmea, gps_buffer, BUF_SIZE);
                 }
                 gps_index = 0;
@@ -130,6 +148,11 @@ void gps_rx_task(void *arg){
 void gps_process_task(void *arg){
     while(1){
         vTaskDelay(5000/portTICK_PERIOD_MS);
+        if(!gps_active){
+            latest_nmea[0]='\0';
+            GPS.dec_latitude=0.0;
+            GPS.dec_longitude=0.0;
+        }
         printf("Latest NMEA: %s\n", latest_nmea);
         if(strlen(latest_nmea)>0 && GPS_validate(latest_nmea)){
             GPS_parse(latest_nmea);
@@ -178,13 +201,17 @@ void mpu6050_task(void *arg){
     }
 }
 bool is_low_battery() {
+    // if(battery_capacity < 20){
+    //     return true;
+    // }
     return false; 
 }
 bool accident_detected() {
     return false; 
 }
 bool is_theft_detected() {
-    if(alarm_state == STATE_ALARM  && antiTheft ){
+    if(alarm_state == STATE_ALARM  /* && antiTheft*/ ){
+        printf("alarm_state=%d\n",alarm_state);
         return true;
     }
     return false; 
@@ -192,12 +219,12 @@ bool is_theft_detected() {
 void Task_StateUpdate(void *pvParameters) {
     device_state_t new_state;
     for (;;) {
-        if (is_low_battery()) 
-            new_state = LOW_BATTERY_STATE;
-        else if (accident_detected())
+        if (accident_detected()) 
             new_state = SOS_STATE;
-        else if (is_theft_detected()) 
+        else if (is_theft_detected())
             new_state = ALERT_STATE;
+        else if (is_low_battery()) 
+            new_state = LOW_BATTERY_STATE;
         else 
             new_state = NORMAL_STATE;
         device_state = new_state;
@@ -209,27 +236,48 @@ void Task_StateUpdate(void *pvParameters) {
 }
 void Task_ActionHandler(void *pvParameters) {
     device_state_t state;
+    static bool sos_sent = false, alert_sent = false;
+    static TickType_t last_sms_time = 0;
     for (;;) {
         if (xQueueReceive(eventQueue, &state, portMAX_DELAY)) {
             switch (state) {
                 case ALERT_STATE:
                     // start_alarm(); 
                     buzzer_on_alarm();
+                    // sim_send_alert_sms("Canh bao mat trom", &alert_sent, &last_sms_time);
+                    sos_sent = false;
                     printf("Device in ALERT_STATE\n");
                     break;
                 case SOS_STATE: 
                     // send_sos_message(); 
+                    sim_send_alert_sms("Canh bao tai nan", &sos_sent, &last_sms_time);
+                    alert_sent = false;
                     break;
                 case LOW_BATTERY_STATE: 
                     // send_low_battery_warning(); 
+                    printf("Device in LOW_BATTERY_STATE\n");
                     break;
                 case NORMAL_STATE: 
                     buzzer_off();
+                    alert_sent = false;
+                    sos_sent = false;
                     printf("Device in NORMAL_STATE\n");
-                    // stop_alarm(); 
                     break;
             }
         }
+    }
+}
+void read_battery_task(void *pb){
+    while(1){
+        static uint16_t read_pin_voltage_value;
+        read_pin_voltage_value=get_value_adc(ADC_CHANNEL_4);
+        float voltage = (read_pin_voltage_value / 4095.0) * 3.3 * 5;
+        // Convert voltage to battery x3 18650 3.7V
+        battery_capacity = (uint8_t) (( voltage / 11) * 100);
+        if(battery_capacity > 100) battery_capacity = 100;
+        printf("Battery Voltage: %.2f V, Battery Level: %d%%\n", voltage, battery_capacity);
+        sim_public_battery_mqtt(battery_capacity);
+        vTaskDelay(30000/portTICK_PERIOD_MS); 
     }
 }
 void app_main() {
@@ -259,6 +307,11 @@ void app_main() {
         ESP_LOGE("BUZZER", "Initialization failed");
         return;
     }
+    ret=adc_init(ADC_CHANNEL_4);
+    if (ret != ESP_OK) {
+        ESP_LOGE("ADC", "Initialization failed");
+        return;
+    }
     input_io_create(GPIO_NUM_4, LO_TO_HI);
     // // Initialize MPU6050
     // ret = mpu6050_init(I2C_NUM_0);
@@ -274,14 +327,16 @@ void app_main() {
     // sim_public_mqtt();
     xTaskCreate(gps_rx_task, "gps_rx_task", 4096, NULL, 5, NULL);
     xTaskCreate(gps_process_task,"gps_process_task",2048,NULL,6,NULL);
-    mqtt_connect("esp32_client", "broker.hivemq.com", 200);
+    mqtt_connect("esp32_client", "broker.hivemq.com", 1000);
     mqtt_subscribe("esp32/device", 0, 1000);
     mqtt_subscribe("esp32/updateOTA", 0, 1000);
     // xTaskCreate(mpu6050_task, "mpu6050_task", 2048, NULL, 7, NULL);
 
     // Task to update device state based on conditions
     xTaskCreate(Task_StateUpdate, "StateUpdate", 2048, NULL, 7, NULL);
-    xTaskCreate(Task_ActionHandler, "ActionHandler", 2048, NULL, 8, NULL);
+    xTaskCreate(Task_ActionHandler, "ActionHandler", 4096, NULL, 8, NULL);
     xTaskCreate(Task_Action_MqttMessage, "MqttMessage", 4096, NULL, 9, NULL);
     xTaskCreate(buzzer_task, "buzzer_task", 2048, NULL, 10, NULL);
+    // xTaskCreate(gps_power_manager_task, "gps_power_manager_task", 2048, NULL, 11, NULL);
+    // xTaskCreate(read_battery_task, "read_battery_task", 2048, NULL, 12, NULL);
 }

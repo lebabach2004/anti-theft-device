@@ -1,10 +1,16 @@
 #include "sim.h"
+#include "gps.h"
+#include "http_server_app.h"
+#include "nvs_flash.h"
+extern GPS_t GPS;
 #define BUF_SIZE 1024
 #define UART_SIM UART_NUM_2
-#define MODULE_SIM_Tx 17
-#define MODULE_SIM_Rx 16
+#define MODULE_SIM_Tx 16
+#define MODULE_SIM_Rx 17
 static const char *TAG = "SIM";
 char deviceId[32];
+extern char *phone_list[10];
+extern int phone_count;
 bool updateLocation = false;
 bool antiTheft = false ;
 bool warning = false;
@@ -156,4 +162,44 @@ void sim_send_sms(const char *phone_number, const char *message, uint32_t timeou
     uint8_t ctrl_z = 26;
     uart_write_bytes(UART_SIM, (const char *)&ctrl_z, 1);
     ESP_LOGI(TAG, "SMS sent to %s: %s", phone_number, message);
+}
+void sim_send_alert_sms(const char *prefix, bool *sent_flag, TickType_t *last_time){
+    if (*sent_flag && (xTaskGetTickCount() - *last_time < pdMS_TO_TICKS(45000))) return;
+
+    char message[256];
+    if (GPS.dec_latitude != 0.0 && GPS.dec_longitude != 0.0) {
+        snprintf(message, sizeof(message),
+                 "%s : https://www.google.com/maps?q=%f,%f",
+                 prefix, GPS.dec_latitude, GPS.dec_longitude);
+    } else {
+        snprintf(message, sizeof(message),
+                 "%s GPS chua co du lieu hop le.", prefix);
+    }
+
+    for (int i = 0; i < phone_count; i++) {
+        sim_send_sms(phone_list[i], message, 500);
+    }
+    ESP_LOGI("SMS", "Sent: %s", prefix);
+
+    *sent_flag = true;
+    *last_time = xTaskGetTickCount();
+}
+esp_err_t antiTheft_save_flash(){
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+    if(err != ESP_OK) return err;
+    err = nvs_set_u8(nvs_handle, "antiTheft", antiTheft ? 1 : 0);
+    if(err == ESP_OK) err = nvs_commit(nvs_handle);
+    nvs_close(nvs_handle);
+    return err;
+}
+esp_err_t antiTheft_load_flash(){
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open("storage", NVS_READONLY, &nvs_handle);
+    if(err != ESP_OK) return err;
+    uint8_t value = 0;
+    err = nvs_get_u8(nvs_handle, "antiTheft", &value);
+    if(err == ESP_OK) antiTheft = (value != 0);
+    nvs_close(nvs_handle);
+    return err;
 }
