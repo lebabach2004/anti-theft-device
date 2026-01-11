@@ -4,7 +4,7 @@
 #include "input_iot.h"
 #include "esp_timer.h"
 #define CONFIRM_WINDOW_MS 500
-#define ALARM_DURATION_MS 10000
+#define ALARM_DURATION_MS 30000
 #define TAG "Vibrate Sensor"
 volatile alarm_state_t alarm_state = STATE_IDLE;
 static volatile int pulse_count = 0;

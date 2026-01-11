@@ -21,7 +21,7 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 #include <sys/socket.h>
-
+#include "app_mqtt.h"
 #define HASH_LEN 32
 
 static const char *TAG = "simple_ota_example";
@@ -98,6 +98,7 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info)
 }
 void ota_esp(void)
 {
+    mqtt_log("START");
     ESP_LOGI(TAG, "Starting OTA example task");
     esp_http_client_config_t config = {
         .url = "http://192.168.0.105/ota.bin",
@@ -109,6 +110,7 @@ void ota_esp(void)
     esp_https_ota_config_t ota_config = {
         .http_config = &config,
     };
+    mqtt_log("DOWNLOADING");
     ESP_LOGI(TAG, "Attempting to download update from %s", config.url);
     esp_https_ota_handle_t https_ota_handle = NULL;
     esp_err_t err = esp_https_ota_begin(&ota_config, &https_ota_handle);
@@ -141,6 +143,7 @@ void ota_esp(void)
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "esp_https_ota_perform failed");
         esp_https_ota_abort(https_ota_handle);
+        mqtt_log("FAIL");
         vTaskDelete(NULL);
     }
 ota_end:
@@ -148,6 +151,7 @@ ota_end:
     if ((err == ESP_OK) && (ota_finish_err == ESP_OK)) {
         ESP_LOGI(TAG, "ESP_HTTPS_OTA upgrade successful. Rebooting ...");
         vTaskDelay(1000 / portTICK_PERIOD_MS);
+        mqtt_log("DONE");
         esp_restart();
     } 
     else {

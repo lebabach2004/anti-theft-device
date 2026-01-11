@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: CC0-1.0
  */
-
+/* -------------------- INCLUDES & DEFINES -------------------- */
 #include <driver/gpio.h>
 #include <driver/spi_master.h>
 #include <esp_log.h>
@@ -15,6 +15,7 @@
 #include <driver/uart.h>
 #include "sdkconfig.h"
 #include "nvs_flash.h"
+// Các header ngoại vi của dự án
 #include "mpu6050.h"
 #include "roll_pitch.h"
 #include "quaternions.h"
@@ -26,25 +27,34 @@
 #include "sim.h"
 #include <json_generator.h>
 #include <json_parser.h>
-#include "esp_task_wdt.h"
 #include <input_iot.h>
 #include "buzzer.h"
 #include "adc.h"
 
-uint8_t battery_capacity=0;
-
-#define PIN_CLK 18
+/* -----------------------------------------------------------
+ * 1. ĐỊNH NGHĨA & BIẾN TOÀN CỤC (GLOBAL VARIABLES)
+ * ----------------------------------------------------------- */
 #define BUF_SIZE 1024
 static const char *TAG = "MAIN";
+// GPS & Communication
 GPS_t GPS;
 QueueHandle_t eventQueue;
 char gps_buffer[BUF_SIZE];
 char latest_nmea[BUF_SIZE];
 int gps_index = 0;
+char sim_public_mqtt_msg[BUF_SIZE];
+
+// Extern từ các module khác
+extern char MAC_address[18];
+extern bool antiTheft,updateLocation,warning,gps_active;
+extern char *phone_list[10];
+extern int phone_count;
+extern bool update_OTA;
+extern volatile alarm_state_t alarm_state;
 extern void mqtt_task(void *arg); 
 extern void buzzer_task(void *arg);
 extern void gps_power_manager_task(void *arg);
-extern char MAC_address[18];
+
 // MPU6050 variables
 int16_t accel_x, accel_y, accel_z;
 int16_t gyro_x, gyro_y, gyro_z;
@@ -52,24 +62,15 @@ float accel_x_g, accel_y_g, accel_z_g;
 float gyro_x_dps, gyro_y_dps, gyro_z_dps;
 float accel_bias[3] = {0.00f, 0.00f, 0.00f};
 float gyro_bias[3] = {0.00f, 0.00f, 0.00f};
-float accChange; // value of acceleration change
+float accChange; 
 
-// mqtt_public_variables
-char sim_public_mqtt_msg[BUF_SIZE];
-extern char MAC_address[18];
+// Device state variables
+uint8_t battery_capacity=100;
 uint8_t status=1;
-extern bool antiTheft;
-extern char *phone_list[10];
-extern int phone_count;
 uint16_t battery=60;
 bool isCharging=false;
-extern bool gps_active;
-// variables from sim.c
-extern bool updateLocation;
-extern bool warning;
-extern bool update_OTA;
-// device state enum and variable
-extern volatile alarm_state_t alarm_state;
+
+// State Machine Enum
 typedef enum{
     NORMAL_STATE,
     ALERT_STATE,
@@ -78,7 +79,14 @@ typedef enum{
 } device_state_t;
 device_state_t device_state = NORMAL_STATE;
 
-// json mqtt publish message
+/* -----------------------------------------------------------
+ * 2. CÁC HÀM TẠO TIN NHẮN JSON (MQTT MESSAGES)
+ * ----------------------------------------------------------- */
+
+
+/**
+ * @brief Tạo JSON tổng hợp trạng thái (Vị trí, Pin, Chống trộm)
+ */
 void sim_public_mqtt(){
     json_gen_str_t jstr;
     json_gen_str_start(&jstr, sim_public_mqtt_msg, BUF_SIZE, NULL, NULL);
@@ -96,6 +104,9 @@ void sim_public_mqtt(){
     json_gen_str_end(&jstr);
     printf("Generated JSON: %s\n", sim_public_mqtt_msg);
 }
+/**
+ * @brief Tạo JSON chỉ chứa thông tin dung lượng Pin
+ */
 void sim_public_battery_mqtt(uint8_t battery){
     json_gen_str_t jstr;
     json_gen_str_start(&jstr, sim_public_mqtt_msg, BUF_SIZE, NULL, NULL);
@@ -103,27 +114,36 @@ void sim_public_battery_mqtt(uint8_t battery){
     json_gen_obj_set_int(&jstr, "battery", battery);
     json_gen_end_object(&jstr);
     json_gen_str_end(&jstr);
+    printf("Generated JSON: %s\n", sim_public_mqtt_msg);
 }
-void Task_Action_MqttMessage(void *arg) {
-    for (;;) {
-        if(updateLocation){
-            static char url[128]; 
-            while(!GPS.dec_latitude && !GPS.dec_longitude){
-                ESP_LOGI("GPS","Waiting for valid GPS data...");
-                vTaskDelay(pdMS_TO_TICKS(1000));
-            }
-            snprintf(url, sizeof(url), "Vi tri hien tai: https://www.google.com/maps?q=%f,%f", GPS.dec_latitude, GPS.dec_longitude);
-            for(int i=0;i<phone_count;i++){
-                sim_send_sms(phone_list[i], url, 500);
-            }
-        }
-        if(warning){
-            alarm_state= STATE_IDLE;
-            warning=false;
-        }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+
+/* -----------------------------------------------------------
+ * 3. HÀM KIỂM TRA ĐIỀU KIỆN (SENSOR & LOGIC CHECK)
+ * ----------------------------------------------------------- */
+bool is_low_battery() {
+    if(battery_capacity < 20){
+        return true;
     }
+    return false; 
 }
+bool accident_detected() {
+    return false; 
+}
+bool is_theft_detected() {
+    if(alarm_state == STATE_ALARM   && antiTheft  ){
+        printf("alarm_state=%d\n",alarm_state);
+        return true;
+    }
+    return false; 
+}
+
+/* -----------------------------------------------------------
+ * 4. CÁC LUỒNG XỬ LÝ (TASKS)
+ * ----------------------------------------------------------- */
+
+/**
+ * @brief Đọc dữ liệu thô từ UART GPS và lọc chuỗi NMEA
+ */
 void gps_rx_task(void *arg){
     uint8_t* data = (uint8_t*) malloc(BUF_SIZE);
     while (1) {
@@ -145,6 +165,10 @@ void gps_rx_task(void *arg){
         vTaskDelay(20/portTICK_PERIOD_MS);
     }
 }
+
+/**
+ * @brief Phân tích chuỗi NMEA và in tọa độ lên Serial
+ */
 void gps_process_task(void *arg){
     while(1){
         vTaskDelay(5000/portTICK_PERIOD_MS);
@@ -163,6 +187,10 @@ void gps_process_task(void *arg){
         }
     }
 }
+
+/**
+ * @brief Đọc dữ liệu từ cảm biến MPU6050 (Gia tốc & Con quay hồi chuyển)
+ */
 void mpu6050_task(void *arg){
     float prev_accel_x_g = 0.0f;
     float prev_accel_y_g = 0.0f;
@@ -177,8 +205,8 @@ void mpu6050_task(void *arg){
         }
         mpu6050_convert_accel(accel_x, accel_y, accel_z, &accel_x_g, &accel_y_g, &accel_z_g);
         mpu6050_convert_gyro(gyro_x, gyro_y, gyro_z, &gyro_x_dps, &gyro_y_dps, &gyro_z_dps);
-        printf("Accel: X=%0.2f m/s^2, Y=%0.2f m/s^2, Z=%0.2f m/s^2\n", accel_x_g, accel_y_g, accel_z_g);
-        printf("Gyro: X=%0.2f deg/s, Y=%0.2f deg/s, Z=%0.2f deg/s\n", gyro_x_dps, gyro_y_dps, gyro_z_dps);
+        // printf("Accel: X=%0.2f m/s^2, Y=%0.2f m/s^2, Z=%0.2f m/s^2\n", accel_x_g, accel_y_g, accel_z_g);
+        // printf("Gyro: X=%0.2f deg/s, Y=%0.2f deg/s, Z=%0.2f deg/s\n", gyro_x_dps, gyro_y_dps, gyro_z_dps);
         if(!first_read){
             // Calculate the change in acceleration
             float dx = accel_x_g - prev_accel_x_g;
@@ -194,28 +222,33 @@ void mpu6050_task(void *arg){
         prev_accel_x_g = accel_x_g;
         prev_accel_y_g = accel_y_g;
         prev_accel_z_g = accel_z_g;
-        printf("Accel: X=%0.2f m/s^2, Y=%0.2f m/s^2, Z=%0.2f m/s^2\n", accel_x_g, accel_y_g, accel_z_g);
-        printf("Gyro: X=%0.2f deg/s, Y=%0.2f deg/s, Z=%0.2f deg/s\n", gyro_x_dps, gyro_y_dps, gyro_z_dps);
-        printf("Acceleration Change: %0.2f m/s^2\n", accChange);
+        // printf("Accel: X=%0.2f m/s^2, Y=%0.2f m/s^2, Z=%0.2f m/s^2\n", accel_x_g, accel_y_g, accel_z_g);
+        // printf("Gyro: X=%0.2f deg/s, Y=%0.2f deg/s, Z=%0.2f deg/s\n", gyro_x_dps, gyro_y_dps, gyro_z_dps);
+        // printf("Acceleration Change: %0.2f m/s^2\n", accChange);
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
 }
-bool is_low_battery() {
-    // if(battery_capacity < 20){
-    //     return true;
-    // }
-    return false; 
-}
-bool accident_detected() {
-    return false; 
-}
-bool is_theft_detected() {
-    if(alarm_state == STATE_ALARM  /* && antiTheft*/ ){
-        printf("alarm_state=%d\n",alarm_state);
-        return true;
+
+/**
+ * @brief Đọc giá trị Pin qua ADC và gửi dữ liệu lên MQTT định kỳ
+ */
+void read_battery_task(void *pb){
+    while(1){
+        static uint16_t read_pin_voltage_value;
+        read_pin_voltage_value=get_value_adc(ADC_CHANNEL_4);
+        float voltage = (read_pin_voltage_value / 4095.0) * 3.3 * 5;
+        // Convert voltage to battery x3 18650 3.7V
+        battery_capacity = (uint8_t) (( voltage / 11) * 100);
+        if(battery_capacity > 100) battery_capacity = 100;
+        printf("Battery Voltage: %.2f V, Battery Level: %d%%\n", voltage, battery_capacity);
+        sim_public_battery_mqtt(battery_capacity);
+        mqtt_publish("esp32/battery", sim_public_mqtt_msg, 1000);
+        vTaskDelay(70000/portTICK_PERIOD_MS); 
     }
-    return false; 
 }
+/**
+ * @brief Cập nhật trạng thái thiết bị dựa trên các điều kiện cảm biến
+ */
 void Task_StateUpdate(void *pvParameters) {
     device_state_t new_state;
     for (;;) {
@@ -234,9 +267,12 @@ void Task_StateUpdate(void *pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(200));
     }
 }
+/**
+ * @brief Thực thi hành động (Còi, SMS) dựa trên trạng thái nhận được từ Queue
+ */
 void Task_ActionHandler(void *pvParameters) {
     device_state_t state;
-    static bool sos_sent = false, alert_sent = false;
+    static bool sos_sent = false, alert_sent = false,alert_low_pin=false;
     static TickType_t last_sms_time = 0;
     for (;;) {
         if (xQueueReceive(eventQueue, &state, portMAX_DELAY)) {
@@ -244,9 +280,9 @@ void Task_ActionHandler(void *pvParameters) {
                 case ALERT_STATE:
                     // start_alarm(); 
                     buzzer_on_alarm();
-                    // sim_send_alert_sms("Canh bao mat trom", &alert_sent, &last_sms_time);
+                    sim_send_alert_sms("Canh bao mat trom", &alert_sent, &last_sms_time);
                     sos_sent = false;
-                    printf("Device in ALERT_STATE\n");
+                    // printf("Device in ALERT_STATE\n");
                     break;
                 case SOS_STATE: 
                     // send_sos_message(); 
@@ -255,31 +291,48 @@ void Task_ActionHandler(void *pvParameters) {
                     break;
                 case LOW_BATTERY_STATE: 
                     // send_low_battery_warning(); 
-                    printf("Device in LOW_BATTERY_STATE\n");
+                    // printf("Device in LOW_BATTERY_STATE\n");
+                    buzzer_off();
+                    alert_sent = false;
+                    sos_sent = false;
+                    sim_send_battery_sms( battery_capacity, &alert_low_pin, &last_sms_time);
                     break;
                 case NORMAL_STATE: 
                     buzzer_off();
                     alert_sent = false;
                     sos_sent = false;
-                    printf("Device in NORMAL_STATE\n");
+                    // printf("Device in NORMAL_STATE\n");
                     break;
             }
         }
     }
 }
-void read_battery_task(void *pb){
-    while(1){
-        static uint16_t read_pin_voltage_value;
-        read_pin_voltage_value=get_value_adc(ADC_CHANNEL_4);
-        float voltage = (read_pin_voltage_value / 4095.0) * 3.3 * 5;
-        // Convert voltage to battery x3 18650 3.7V
-        battery_capacity = (uint8_t) (( voltage / 11) * 100);
-        if(battery_capacity > 100) battery_capacity = 100;
-        printf("Battery Voltage: %.2f V, Battery Level: %d%%\n", voltage, battery_capacity);
-        sim_public_battery_mqtt(battery_capacity);
-        vTaskDelay(30000/portTICK_PERIOD_MS); 
+/**
+ * @brief Task xử lý các tin nhắn MQTT liên quan đến cập nhật vị trí và cảnh báo
+ */
+void Task_Action_MqttMessage(void *arg) {
+    for (;;) {
+        if(updateLocation){
+            static char url[128]; 
+            while(!GPS.dec_latitude && !GPS.dec_longitude){
+                ESP_LOGI("GPS","Waiting for valid GPS data...");
+                vTaskDelay(pdMS_TO_TICKS(1000));
+            }
+            snprintf(url, sizeof(url), "Vi tri hien tai: https://www.google.com/maps?q=%f,%f", GPS.dec_latitude, GPS.dec_longitude);
+            for(int i=0;i<phone_count;i++){
+                sim_send_sms(phone_list[i], url, 500);
+            }
+        }
+        if(warning){
+            alarm_state= STATE_IDLE;
+            warning=false;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
+/* -----------------------------------------------------------
+ * 5. HÀM KHỞI TẠO CHÍNH (APP_MAIN)
+ * ----------------------------------------------------------- */
 void app_main() {
     //Initialize NVS
     esp_err_t ret = nvs_flash_init();
@@ -288,9 +341,10 @@ void app_main() {
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+    // Create event queue
     eventQueue = xQueueCreate(10, sizeof(device_state_t));
     
-    // Init SIM800C
+    // Init Module SIM
     ret=SIM_init();
     if (ret != ESP_OK) {
         ESP_LOGE("SIM", "Initialization failed");
@@ -302,41 +356,53 @@ void app_main() {
         ESP_LOGE("GPS", "Initialization failed");
         return;
     }
+    // Init Buzzer
     ret=buzzer_init(23);
     if (ret != ESP_OK) {
         ESP_LOGE("BUZZER", "Initialization failed");
         return;
     }
+    // Init ADC for battery reading
     ret=adc_init(ADC_CHANNEL_4);
     if (ret != ESP_OK) {
         ESP_LOGE("ADC", "Initialization failed");
         return;
     }
     input_io_create(GPIO_NUM_4, LO_TO_HI);
+
     // // Initialize MPU6050
-    // ret = mpu6050_init(I2C_NUM_0);
-    // if (ret != ESP_OK) {
-    //     ESP_LOGE("MPU6050", "Initialization failed");
-    //     return;
+    ret = mpu6050_init(I2C_NUM_0);
+    if (ret != ESP_OK) {
+        ESP_LOGE("MPU6050", "Initialization failed");
+        return;
+    }
+    mpu6050_calibrate(I2C_NUM_0, accel_bias, gyro_bias);
+    // C. Khởi tạo kết nối mạng (WiFi, AP, MQTT)
+
+    // if (wifi_start()) {
+    //     ESP_LOGI(TAG, "WiFi OK → normal run, wait OTA command");
+
+    // } else {
+    //     ESP_LOGI(TAG, "WiFi FAIL → start AP");
+    //     esp_ap_start();
     // }
-    // mpu6050_calibrate(I2C_NUM_0, accel_bias, gyro_bias);
-    // wifi_start();
     xTaskCreate(mqtt_task, "mqtt_task", 4096, NULL, 4, NULL);
     esp_ap_start();
     start_webserver();
     // sim_public_mqtt();
+
+    // D. Tạo các Task FreeRTOS
     xTaskCreate(gps_rx_task, "gps_rx_task", 4096, NULL, 5, NULL);
     xTaskCreate(gps_process_task,"gps_process_task",2048,NULL,6,NULL);
     mqtt_connect("esp32_client", "broker.hivemq.com", 1000);
     mqtt_subscribe("esp32/device", 0, 1000);
     mqtt_subscribe("esp32/updateOTA", 0, 1000);
-    // xTaskCreate(mpu6050_task, "mpu6050_task", 2048, NULL, 7, NULL);
-
-    // Task to update device state based on conditions
+    xTaskCreate(mpu6050_task, "mpu6050_task", 2048, NULL, 7, NULL);
+    
     xTaskCreate(Task_StateUpdate, "StateUpdate", 2048, NULL, 7, NULL);
     xTaskCreate(Task_ActionHandler, "ActionHandler", 4096, NULL, 8, NULL);
     xTaskCreate(Task_Action_MqttMessage, "MqttMessage", 4096, NULL, 9, NULL);
     xTaskCreate(buzzer_task, "buzzer_task", 2048, NULL, 10, NULL);
-    // xTaskCreate(gps_power_manager_task, "gps_power_manager_task", 2048, NULL, 11, NULL);
-    // xTaskCreate(read_battery_task, "read_battery_task", 2048, NULL, 12, NULL);
+    xTaskCreate(gps_power_manager_task, "gps_power_manager_task", 2048, NULL, 11, NULL);
+    xTaskCreate(read_battery_task, "read_battery_task", 2048, NULL, 12, NULL);
 }

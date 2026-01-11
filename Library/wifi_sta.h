@@ -12,5 +12,5 @@
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
-void wifi_start(void);
+bool wifi_start(void);
 #endif

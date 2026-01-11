@@ -184,6 +184,17 @@ void sim_send_alert_sms(const char *prefix, bool *sent_flag, TickType_t *last_ti
     *sent_flag = true;
     *last_time = xTaskGetTickCount();
 }
+void sim_send_battery_sms( uint8_t battery_level, bool *sent_flag, TickType_t *last_time) {
+    if (*sent_flag && (xTaskGetTickCount() - *last_time < pdMS_TO_TICKS(45000))) return;
+    char message[64];
+    snprintf(message, sizeof(message), "Canh bao pin yeu: %d%%", battery_level);
+    for (int i = 0; i < phone_count; i++) {
+        sim_send_sms(phone_list[i], message, 500);
+    }
+    ESP_LOGI("SMS", "Sent: %s", message);
+    *sent_flag = true;
+    *last_time = xTaskGetTickCount();
+}
 esp_err_t antiTheft_save_flash(){
     nvs_handle_t nvs_handle;
     esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);

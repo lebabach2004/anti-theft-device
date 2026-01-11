@@ -14,4 +14,6 @@ void mqtt_subscribe(const char *topic, uint8_t qos, uint32_t timeout);
 void mqtt_publish(const char *topic, const char *message, uint32_t timeout);
 void sim_send_sms(const char *phone_number, const char *message, uint32_t timeout);
 void sim_send_alert_sms(const char *prefix, bool *sent_flag, TickType_t *last_time);
+void sim_send_battery_sms( uint8_t battery_level, bool *sent_flag, TickType_t *last_time);
+
 #endif
